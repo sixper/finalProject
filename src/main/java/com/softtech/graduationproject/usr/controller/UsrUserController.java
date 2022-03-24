@@ -49,10 +49,10 @@ public class UsrUserController {
         return ResponseEntity.ok(RestResponse.go(usrUserDto));
     }
 
-    @DeleteMapping
-    public ResponseEntity delete(@RequestParam String username, @RequestParam String password){
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable Long id){
 
-        usrUserService.delete(username, password);
+        usrUserService.delete(id);
 
         return ResponseEntity.ok(RestResponse.empty());
     }

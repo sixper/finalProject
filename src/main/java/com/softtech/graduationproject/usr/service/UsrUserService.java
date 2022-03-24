@@ -11,6 +11,7 @@ import com.softtech.graduationproject.usr.entity.UsrUser;
 import com.softtech.graduationproject.usr.enums.UsrUserErrorMessage;
 import com.softtech.graduationproject.usr.service.entityservice.UsrUserEntityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,16 +72,11 @@ public class UsrUserService {
     }
 
 
-    public void delete(String username, String password){
+    public void delete(Long id){
 
-        UsrUser usrUser = usrUserEntityService.findByUsernameAndPassword(username, password);
+        UsrUser usrUser = usrUserEntityService.getByIdWithControl(id);
 
-        if(usrUser != null){
-            usrUserEntityService.delete(usrUser);
-        }else{
-            throw new EntityNotFoundException(GenErrorMessage.ENTITY_NOT_FOUND);
-        }
-
+        usrUserEntityService.delete(usrUser);
     }
 
     private void validateUser(UsrUser usrUser) {
