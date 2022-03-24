@@ -17,4 +17,9 @@ public class UsrUserEntityService extends BaseEntityService<UsrUser, UsrUserDao>
         return getDao().findByUsername(username);
     }
 
+    public UsrUser findByUsernameAndPassword(String username, String password){
+
+        return getDao().findByUsernameAndPassword(username, password);
+    }
+
 }

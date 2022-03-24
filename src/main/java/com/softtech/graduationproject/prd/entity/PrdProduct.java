@@ -23,12 +23,12 @@ public class PrdProduct extends BaseEntity {
     @Column(name = "PRODUCT_NAME", length = 30, nullable = false)
     private String productName;
 
-    @Column(name = "TAX_FREE_PRICE", precision = 19, scale = 2)
+    @Column(name = "TAX_FREE_PRICE", precision = 19, scale = 2, nullable = false)
     private BigDecimal taxFreePrice;
 
-    @Column(name = "VAT", precision = 19, scale = 2)
-    private BigDecimal VAT;
+    @Column(name = "VAT_RATE", precision = 19, scale = 2)
+    private BigDecimal vatRate;
 
-    @Column(name = "PRICE", precision = 19, scale = 2)
+    @Column(name = "PRICE", precision = 19, scale = 2, nullable = false)
     private BigDecimal price;
 }

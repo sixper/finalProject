@@ -14,6 +14,10 @@ public enum PrdProductType {
 
     private int select;
 
+    public void setSelect(int select) {
+        this.select = select;
+    }
+
     public int getVat() {
         return select;
     }

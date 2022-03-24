@@ -41,10 +41,18 @@ public class UsrUserController {
         return ResponseEntity.ok(RestResponse.go(usrUserDto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable Long id){
+    @PatchMapping("/{id}")
+    public ResponseEntity update(@PathVariable Long id, @RequestBody UsrUserSaveDto usrUserSaveDto){
 
-        usrUserService.delete(id);
+        UsrUserDto usrUserDto = usrUserService.update(id, usrUserSaveDto);
+
+        return ResponseEntity.ok(RestResponse.go(usrUserDto));
+    }
+
+    @DeleteMapping
+    public ResponseEntity delete(@RequestParam String username, @RequestParam String password){
+
+        usrUserService.delete(username, password);
 
         return ResponseEntity.ok(RestResponse.empty());
     }

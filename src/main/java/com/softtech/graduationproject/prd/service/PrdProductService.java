@@ -1,5 +1,7 @@
 package com.softtech.graduationproject.prd.service;
 
+import com.softtech.graduationproject.gen.enums.GenErrorMessage;
+import com.softtech.graduationproject.gen.exceptions.EntityNotFoundException;
 import com.softtech.graduationproject.gen.exceptions.InvalidProductException;
 import com.softtech.graduationproject.gen.exceptions.InvalidProductPriceException;
 import com.softtech.graduationproject.prd.converter.PrdProductMapper;
@@ -27,6 +29,10 @@ public class PrdProductService {
 
         List<PrdProduct> prdProductList = prdProductEntityService.findAll();
 
+        if(prdProductList.isEmpty()){
+            throw new EntityNotFoundException(GenErrorMessage.ENTITIES_NOT_FOUND);
+        }
+
         return PrdProductMapper.INSTANCE.convertToPrdProductDtoList(prdProductList);
     }
 
@@ -46,7 +52,28 @@ public class PrdProductService {
 
         prdProduct = prdProductEntityService.save(prdProduct);
 
+
         return PrdProductMapper.INSTANCE.convertToPrdProductDto(prdProduct);
+    }
+
+    public PrdProductDto update(Long id, PrdProductSaveDto prdProductSaveDto) {
+
+        if(prdProductEntityService.existsById(id)){
+
+            PrdProduct prdProduct = PrdProductMapper.INSTANCE.convertToPrdProduct(prdProductSaveDto);
+            prdProduct.setId(id);
+
+            validateProduct(prdProduct);
+            calculateVat(prdProduct);
+
+            prdProduct = prdProductEntityService.save(prdProduct);
+
+            return PrdProductMapper.INSTANCE.convertToPrdProductDto(prdProduct);
+
+        }else{
+            throw new EntityNotFoundException(GenErrorMessage.ENTITY_NOT_FOUND);
+        }
+
     }
 
     public void delete(Long id){
@@ -62,11 +89,11 @@ public class PrdProductService {
         String productName = prdProduct.getProductName();
         BigDecimal taxFreePrice = prdProduct.getTaxFreePrice();
 
-        if(productType == null || productName == null || taxFreePrice == null){
+        if(productType == null || productName == null || taxFreePrice == null || productName.length() > 30){
 
             throw new InvalidProductException(PrdProductErrorMessage.INVALID_PRODUCT);
 
-        }else if(taxFreePrice.compareTo(BigDecimal.ZERO) < 0){
+        }else if(taxFreePrice.compareTo(BigDecimal.ZERO) <= 0){
 
             throw new InvalidProductPriceException(PrdProductErrorMessage.INVALID_PRODUCT_PRICE);
         }
@@ -74,11 +101,11 @@ public class PrdProductService {
 
     public void calculateVat(PrdProduct prdProduct){
 
-        int VAT = prdProduct.getPrdProductType().getVat();
+        BigDecimal vatRate = BigDecimal.valueOf(prdProduct.getPrdProductType().getVat()).divide(BigDecimal.valueOf(100));
 
-        BigDecimal tax = prdProduct.getTaxFreePrice().multiply(BigDecimal.valueOf(VAT)).divide(BigDecimal.valueOf(100));
+        prdProduct.setVatRate(vatRate.multiply(BigDecimal.valueOf(100)));
 
-        prdProduct.setVAT(tax);
+        BigDecimal tax = prdProduct.getTaxFreePrice().multiply(vatRate);
 
         prdProduct.setPrice(tax.add(prdProduct.getTaxFreePrice()));
     }
@@ -87,6 +114,12 @@ public class PrdProductService {
 
         List<PrdProduct> prdProductList = prdProductEntityService.findByProductType(prdProductType);
 
+        if(prdProductList.isEmpty()){
+            throw new EntityNotFoundException(PrdProductErrorMessage.PRODUCT_TYPE_NOT_FOUND);
+        }else{
+            System.out.println("Test");
+        }
+
         return PrdProductMapper.INSTANCE.convertToPrdProductDtoList(prdProductList);
     }
 
@@ -94,30 +127,29 @@ public class PrdProductService {
 
         List<PrdProduct> prdProductList = prdProductEntityService.findAllByPriceBetween(lower, upper);
 
+        if(prdProductList.isEmpty()){
+            throw new EntityNotFoundException(PrdProductErrorMessage.PRODUCT_PRICE_RANGE_NOT_FOUND);
+        }
+
         return PrdProductMapper.INSTANCE.convertToPrdProductDtoList(prdProductList);
     }
 
     public PrdProductDetailDto findProductDetail(PrdProductType prdProductType) {
 
-        List<PrdProduct> prdProductList = prdProductEntityService.findByProductType(prdProductType);
-
-        return setDetails(prdProductList);
-    }
-
-    public PrdProductDetailDto setDetails(List<PrdProduct> prdProductList){
-
         PrdProductDetailDto prdProductDetailDto = new PrdProductDetailDto();
 
-        int vatRate = prdProductList.get(0).getPrdProductType().getVat();
+        List<PrdProductDto> prdProductDtoList = findByProductType(prdProductType);
 
-        prdProductDetailDto.setVatRate(BigDecimal.valueOf(vatRate));
-        prdProductDetailDto.setPrdProductType(prdProductList.get(0).getPrdProductType());
+        BigDecimal vatRate = BigDecimal.valueOf(prdProductType.getVat());
+
+        prdProductDetailDto.setVatRate(vatRate);
+        prdProductDetailDto.setPrdProductType(prdProductType);
 
         BigDecimal min = BigDecimal.ZERO;
         BigDecimal max = BigDecimal.ZERO;
         BigDecimal average = BigDecimal.ZERO;
         Long count = 0L;
-        for(PrdProduct element : prdProductList){
+        for(PrdProductDto element : prdProductDtoList){
 
             BigDecimal price = element.getPrice();
 
@@ -137,5 +169,8 @@ public class PrdProductService {
         prdProductDetailDto.setProductCount(count);
 
         return prdProductDetailDto;
+
+
     }
+
 }

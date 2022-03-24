@@ -45,6 +45,14 @@ public class PrdProductController {
         return ResponseEntity.ok((RestResponse.go(prdProductDto)));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity update(@PathVariable Long id, @RequestBody PrdProductSaveDto prdProductSaveDto){
+
+        PrdProductDto prdProductDto = prdProductService.update(id, prdProductSaveDto);
+
+        return ResponseEntity.ok(RestResponse.go(prdProductDto));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Long id){
 

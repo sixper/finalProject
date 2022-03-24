@@ -33,7 +33,7 @@ public class GenCustomizedResponseEntityExceptionHandler extends ResponseEntityE
 
 
     @ExceptionHandler
-    public final ResponseEntity<Object> handleDuplicateEntityExceptions(InvalidPasswordException ex){
+    public final ResponseEntity<Object> handleDuplicateEntityExceptions(DuplicateUserException ex){
         Date errorDate = new Date();
         String message = ex.getBaseErrorMessage().getMessage();
         String detailMessage = ex.getBaseErrorMessage().getDetailMessage();
@@ -44,7 +44,18 @@ public class GenCustomizedResponseEntityExceptionHandler extends ResponseEntityE
     }
 
     @ExceptionHandler
-    public final ResponseEntity<Object> handleInvalidPasswordExceptions(DuplicateUserException ex){
+    public final ResponseEntity<Object> handleInvalidUsernameException(InvalidUsernameException ex){
+        Date errorDate = new Date();
+        String message = ex.getBaseErrorMessage().getMessage();
+        String detailMessage = ex.getBaseErrorMessage().getDetailMessage();
+        GenExceptionResponse genExceptionResponse = new GenExceptionResponse(errorDate,message,detailMessage, HttpStatus.CONFLICT.value());
+        RestResponse<GenExceptionResponse> restResponse = RestResponse.error(genExceptionResponse);
+        restResponse.setMessage("InvalidUsernameException");
+        return new ResponseEntity<>(restResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public final ResponseEntity<Object> handleInvalidPasswordExceptions(InvalidPasswordException ex){
         Date errorDate = new Date();
         String message = ex.getBaseErrorMessage().getMessage();
         String detailMessage = ex.getBaseErrorMessage().getDetailMessage();
@@ -62,6 +73,17 @@ public class GenCustomizedResponseEntityExceptionHandler extends ResponseEntityE
         GenExceptionResponse genExceptionResponse = new GenExceptionResponse(errorDate,message,detailMessage, HttpStatus.CONFLICT.value());
         RestResponse<GenExceptionResponse> restResponse = RestResponse.error(genExceptionResponse);
         restResponse.setMessage("InvalidProductException");
+        return new ResponseEntity<>(restResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public final ResponseEntity<Object> handleInvalidFieldException(InvalidFieldException ex){
+        Date errorDate = new Date();
+        String message = ex.getBaseErrorMessage().getMessage();
+        String detailMessage = ex.getBaseErrorMessage().getDetailMessage();
+        GenExceptionResponse genExceptionResponse = new GenExceptionResponse(errorDate,message,detailMessage, HttpStatus.CONFLICT.value());
+        RestResponse<GenExceptionResponse> restResponse = RestResponse.error(genExceptionResponse);
+        restResponse.setMessage("InvalidFieldException");
         return new ResponseEntity<>(restResponse, HttpStatus.CONFLICT);
     }
 

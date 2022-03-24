@@ -20,9 +20,9 @@ public class UsrUser extends BaseEntity {
     @Column(name = "PASSWORD", length = 30, nullable = false)
     private String password;
 
-    @Column(name = "NAME", length = 30, nullable = false)
+    @Column(name = "NAME", length = 30)
     private String name;
 
-    @Column(name = "SURNAME", length = 30, nullable = false)
+    @Column(name = "SURNAME", length = 30)
     private String surname;
 }

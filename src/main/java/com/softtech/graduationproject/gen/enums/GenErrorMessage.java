@@ -2,7 +2,8 @@ package com.softtech.graduationproject.gen.enums;
 
 public enum GenErrorMessage implements BaseErrorMessage{
 
-    ENTITY_NOT_FOUND("Entity not found!", "Could not found an entity with this ID"),
+    ENTITY_NOT_FOUND("Entity not found!", "Could not found an entity"),
+    ENTITIES_NOT_FOUND("Entities not found!", "Could not found any entity"),
     ;
 
     private final String message;
