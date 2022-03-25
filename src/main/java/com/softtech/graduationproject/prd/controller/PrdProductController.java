@@ -53,6 +53,22 @@ public class PrdProductController {
         return ResponseEntity.ok(RestResponse.go(prdProductDto));
     }
 
+    @PatchMapping("/updatePrice/{id}")
+    public ResponseEntity updatePrice(@PathVariable Long id, @RequestParam BigDecimal price){
+
+        PrdProductDto prdProductDto = prdProductService.updatePrice(id, price);
+
+        return ResponseEntity.ok(RestResponse.go(prdProductDto));
+    }
+
+    @PatchMapping("/updateVAT")
+    public ResponseEntity updateVat(@RequestParam PrdProductType prdProductType, @RequestParam BigDecimal vatRate){
+
+        List<PrdProductDto> prdProductDtoList = prdProductService.updateVat(prdProductType, vatRate);
+
+        return ResponseEntity.ok(RestResponse.go(prdProductDtoList));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Long id){
 

@@ -19,4 +19,6 @@ public interface PrdProductMapper {
     PrdProductDto convertToPrdProductDto(PrdProduct prdProduct);
 
     PrdProduct convertToPrdProduct(PrdProductSaveDto prdProductSaveDto);
+
+    PrdProductSaveDto convertToPrdProductSaveDto(PrdProduct prdProduct);
 }

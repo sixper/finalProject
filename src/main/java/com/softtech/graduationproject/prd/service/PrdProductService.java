@@ -4,6 +4,7 @@ import com.softtech.graduationproject.gen.enums.GenErrorMessage;
 import com.softtech.graduationproject.gen.exceptions.EntityNotFoundException;
 import com.softtech.graduationproject.gen.exceptions.InvalidProductException;
 import com.softtech.graduationproject.gen.exceptions.InvalidProductPriceException;
+import com.softtech.graduationproject.gen.exceptions.InvalidVatException;
 import com.softtech.graduationproject.prd.converter.PrdProductMapper;
 import com.softtech.graduationproject.prd.dto.PrdProductDetailDto;
 import com.softtech.graduationproject.prd.dto.PrdProductDto;
@@ -13,14 +14,17 @@ import com.softtech.graduationproject.prd.enums.PrdProductErrorMessage;
 import com.softtech.graduationproject.prd.enums.PrdProductType;
 import com.softtech.graduationproject.prd.service.entityservice.PrdProductEntityService;
 
+import com.softtech.graduationproject.prd.util.Vat;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PrdProductService {
 
     private final PrdProductEntityService prdProductEntityService;
@@ -76,6 +80,45 @@ public class PrdProductService {
 
     }
 
+    public PrdProductDto updatePrice(Long id, BigDecimal price) {
+
+        PrdProduct prdProduct = prdProductEntityService.getByIdWithControl(id);
+
+        if(price.compareTo(BigDecimal.ZERO) > 0){
+
+            prdProduct.setTaxFreePrice(price);
+            calculateVat(prdProduct);
+            prdProduct = prdProductEntityService.save(prdProduct);
+
+            return PrdProductMapper.INSTANCE.convertToPrdProductDto(prdProduct);
+
+        }else{
+            throw new InvalidProductPriceException(PrdProductErrorMessage.INVALID_PRODUCT_PRICE);
+        }
+
+    }
+
+    @Transactional
+    public List<PrdProductDto> updateVat(PrdProductType prdProductType, BigDecimal vatRate) {
+
+        if(vatRate.compareTo(BigDecimal.ZERO) < 0)
+            throw new InvalidVatException(PrdProductErrorMessage.INVALID_PRODUCT_VAT);
+
+        Vat.setVat(prdProductType, vatRate);
+
+        List<PrdProduct> prdProductList = prdProductEntityService.findByProductType(prdProductType);
+
+        for(PrdProduct prdProduct : prdProductList){
+
+            prdProduct.setVatRate(vatRate);
+            calculateVat(prdProduct);
+
+            prdProductEntityService.save(prdProduct);
+        }
+
+        return PrdProductMapper.INSTANCE.convertToPrdProductDtoList(prdProductList);
+    }
+
     public void delete(Long id){
 
         PrdProduct prdProduct = prdProductEntityService.getByIdWithControl(id);
@@ -101,7 +144,7 @@ public class PrdProductService {
 
     public void calculateVat(PrdProduct prdProduct){
 
-        BigDecimal vatRate = BigDecimal.valueOf(prdProduct.getPrdProductType().getVat()).divide(BigDecimal.valueOf(100));
+        BigDecimal vatRate = Vat.getVat(prdProduct.getPrdProductType()).divide(BigDecimal.valueOf(100));
 
         prdProduct.setVatRate(vatRate.multiply(BigDecimal.valueOf(100)));
 
@@ -140,7 +183,7 @@ public class PrdProductService {
 
         List<PrdProductDto> prdProductDtoList = findByProductType(prdProductType);
 
-        BigDecimal vatRate = BigDecimal.valueOf(prdProductType.getVat());
+        BigDecimal vatRate = Vat.getVat(prdProductType);
 
         prdProductDetailDto.setVatRate(vatRate);
         prdProductDetailDto.setPrdProductType(prdProductType);

@@ -88,15 +88,17 @@ public class GenCustomizedResponseEntityExceptionHandler extends ResponseEntityE
     }
 
     @ExceptionHandler
-    public final ResponseEntity<Object> handleInvalidProductPriceExceptions(InvalidProductPriceException ex){
+    public final ResponseEntity<Object> handleInvalidVatException(InvalidVatException ex){
         Date errorDate = new Date();
         String message = ex.getBaseErrorMessage().getMessage();
         String detailMessage = ex.getBaseErrorMessage().getDetailMessage();
         GenExceptionResponse genExceptionResponse = new GenExceptionResponse(errorDate,message,detailMessage, HttpStatus.CONFLICT.value());
         RestResponse<GenExceptionResponse> restResponse = RestResponse.error(genExceptionResponse);
-        restResponse.setMessage("InvalidProductPriceException");
+        restResponse.setMessage("InvalidVatException");
         return new ResponseEntity<>(restResponse, HttpStatus.CONFLICT);
     }
+
+
 
 
 }

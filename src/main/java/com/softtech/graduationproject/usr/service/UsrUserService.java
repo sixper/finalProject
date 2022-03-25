@@ -11,7 +11,6 @@ import com.softtech.graduationproject.usr.entity.UsrUser;
 import com.softtech.graduationproject.usr.enums.UsrUserErrorMessage;
 import com.softtech.graduationproject.usr.service.entityservice.UsrUserEntityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -4,25 +4,12 @@ import java.math.BigDecimal;
 
 public enum PrdProductType {
 
-    FOOD(1),
-    STATIONARY(8),
-    CLOTHING(8),
-    TECHNOLOGY(18),
-    CLEANING(18),
-    OTHER(8),
+    FOOD,
+    STATIONARY,
+    CLOTHING,
+    TECHNOLOGY,
+    CLEANING,
+    OTHER,
     ;
 
-    private int select;
-
-    public void setSelect(int select) {
-        this.select = select;
-    }
-
-    public int getVat() {
-        return select;
-    }
-
-    PrdProductType(int select) {
-        this.select = select;
-    }
 }
